@@ -23,15 +23,36 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
-    - name: Build Release
-      run: dotnet build --configuration Release --no-restore
+    - name: Publish Self-Contained (Windows x64)
+      run: |
+        dotnet publish --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=true `
+          -p:EnableCompressionInSingleFile=true `
+          --output ./publish/win-x64
       
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish --no-build
+    - name: Publish Self-Contained (Windows x86)
+      run: |
+        dotnet publish --configuration Release `
+          --runtime win-x86 `
+          --self-contained true `
+          -p:PublishSingleFile=true `
+          -p:PublishTrimmed=true `
+          -p:EnableCompressionInSingleFile=true `
+          --output ./publish/win-x86
       
-    - name: Upload build artifacts
+    - name: Upload Windows x64 build
       uses: actions/upload-artifact@v4
       with:
-        name: CreamInstaller-Release
-        path: ./publish/**/*
+        name: CreamInstaller-win-x64
+        path: ./publish/win-x64/**/*
+        if-no-files-found: error
+        
+    - name: Upload Windows x86 build
+      uses: actions/upload-artifact@v4
+      with:
+        name: CreamInstaller-win-x86
+        path: ./publish/win-x86/**/*
         if-no-files-found: error
